@@ -417,10 +417,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
     marginLeft: 8,
+    marginLeft: 8,
   },
   pnlPercentage: {
     fontSize: 14,
     fontFamily: 'Inter_500Medium',
+    marginLeft: 8,
     marginLeft: 8,
   },
 });

@@ -202,7 +202,7 @@ export default function SignalHistoryScreen() {
             <Text style={[styles.statValue, { color: '#22c55e' }]}>{stats.winRate}%</Text>
             <Text style={styles.statLabel}>Win Rate</Text>
           </View>
-          <View style={styles.statCard}>
+          <View style={styles.statCardLast}>
             <Text style={[styles.statValue, { color: stats.totalPnl > 0 ? '#22c55e' : '#ef4444' }]}>
               ${stats.totalPnl.toFixed(0)}
             </Text>
@@ -215,7 +215,11 @@ export default function SignalHistoryScreen() {
           {['all', 'active', 'closed'].map((filterType) => (
             <TouchableOpacity
               key={filterType}
-              style={[styles.filterButton, filter === filterType && styles.filterButtonActive]}
+              style={[
+                styles.filterButton, 
+                filter === filterType && styles.filterButtonActive,
+                filterType === 'closed' && { marginRight: 0 }
+              ]}
               onPress={() => setFilter(filterType as any)}
             >
               <Text style={[styles.filterText, filter === filterType && styles.filterTextActive]}>
@@ -273,9 +277,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 24,
     marginBottom: 24,
-    gap: 12,
   },
   statCard: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    padding: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginRight: 12,
+  },
+  statCardLast: {
     flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 12,
@@ -299,7 +312,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 24,
     marginBottom: 16,
-    gap: 8,
   },
   filterButton: {
     paddingHorizontal: 16,
@@ -308,6 +320,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginRight: 8,
   },
   filterButtonActive: {
     backgroundColor: 'rgba(34, 197, 94, 0.2)',
@@ -345,13 +358,14 @@ const styles = StyleSheet.create({
   symbolContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
     marginBottom: 4,
   },
   symbol: {
     fontSize: 18,
     fontFamily: 'Inter_600SemiBold',
     color: 'white',
+    marginLeft: 8,
+    marginRight: 8,
   },
   actionBadge: {
     paddingHorizontal: 8,
@@ -370,11 +384,11 @@ const styles = StyleSheet.create({
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
   },
   statusText: {
     fontSize: 12,
     fontFamily: 'Inter_500Medium',
+    marginLeft: 6,
   },
   priceContainer: {
     marginBottom: 16,
@@ -402,14 +416,15 @@ const styles = StyleSheet.create({
   pnlRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
   pnlValue: {
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
+    marginLeft: 8,
   },
   pnlPercentage: {
     fontSize: 14,
     fontFamily: 'Inter_500Medium',
+    marginLeft: 8,
   },
 });

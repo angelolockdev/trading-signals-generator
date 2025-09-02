@@ -244,7 +244,7 @@ ${isAutoMode ? `📐 SL: ${autoCalc.slPercentage}% | Risk Management\n` : ''}${n
                 </View>
               </View>
               
-              <View style={styles.zoneInput}>
+              <View style={styles.zoneInputLast}>
                 <Text style={styles.zoneLabel}>To</Text>
                 <View style={styles.priceInputContainer}>
                   <Text style={styles.currencySymbol}>$</Text>
@@ -337,7 +337,7 @@ ${isAutoMode ? `📐 SL: ${autoCalc.slPercentage}% | Risk Management\n` : ''}${n
                       autoCorrect={false}
                     />
                   </View>
-                  <View style={styles.pipInput}>
+                  <View style={styles.pipInputLast}>
                     <Text style={styles.pipLabel}>TP3</Text>
                     <TextInput
                       style={styles.pipInputField}
@@ -597,9 +597,12 @@ const styles = StyleSheet.create({
   },
   zoneContainer: {
     flexDirection: 'row',
-    gap: 12,
   },
   zoneInput: {
+    flex: 1,
+    marginRight: 12,
+  },
+  zoneInputLast: {
     flex: 1,
   },
   zoneLabel: {
@@ -649,7 +652,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 12,
     borderRadius: 8,
-    gap: 8,
   },
   actionButtonActive: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -658,6 +660,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter_500Medium',
     color: '#94a3b8',
+    marginLeft: 8,
   },
   actionTextActive: {
     color: 'white',
@@ -677,7 +680,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 10,
     borderRadius: 8,
-    gap: 6,
   },
   modeButtonActive: {
     backgroundColor: 'rgba(59, 130, 246, 0.2)',
@@ -686,6 +688,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Inter_500Medium',
     color: '#94a3b8',
+    marginLeft: 6,
   },
   modeTextActive: {
     color: 'white',
@@ -698,9 +701,13 @@ const styles = StyleSheet.create({
   },
   pipsContainer: {
     flexDirection: 'row',
-    gap: 12,
   },
   pipInput: {
+    flex: 1,
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  pipInputLast: {
     flex: 1,
     alignItems: 'center',
   },
@@ -772,7 +779,6 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   buttonContainer: {
-    gap: 16,
     paddingBottom: 40,
   },
   actionButtonLarge: {
@@ -782,7 +788,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 16,
     padding: 18,
-    gap: 12,
+    marginBottom: 16,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
   },
@@ -795,17 +801,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 18,
-    gap: 12,
   },
   actionButtonText: {
     fontSize: 16,
     fontFamily: 'Inter_500Medium',
     color: 'white',
+    marginLeft: 12,
   },
   primaryButtonText: {
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
     color: 'white',
+    marginLeft: 12,
   },
   disabledButton: {
     opacity: 0.5,

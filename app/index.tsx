@@ -61,7 +61,7 @@ export default function HomeScreen() {
           {/* Stats Cards */}
           <View style={styles.statsContainer}>
             {stats.map((stat, index) => (
-              <View key={index} style={styles.statCard}>
+              <View key={index} style={index === stats.length - 1 ? styles.statCardLast : styles.statCard}>
                 <stat.icon size={20} color="#22c55e" />
                 <Text style={styles.statValue}>{stat.value}</Text>
                 <Text style={styles.statLabel}>{stat.label}</Text>
@@ -93,7 +93,10 @@ export default function HomeScreen() {
               {features.map((feature, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={styles.featureCard}
+                  style={[
+                    styles.featureCard,
+                    index % 2 === 1 && { marginRight: 0 }
+                  ]}
                   onPress={() => router.push(feature.route)}
                 >
                   <View style={[styles.featureIcon, { backgroundColor: `${feature.color}20` }]}>
@@ -167,9 +170,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 24,
     marginBottom: 32,
-    gap: 12,
   },
   statCard: {
+    flex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 16,
+    padding: 16,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginRight: 12,
+  },
+  statCardLast: {
     flex: 1,
     backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderRadius: 16,
@@ -209,17 +221,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    gap: 12,
   },
   primaryButtonText: {
     fontSize: 18,
     fontFamily: 'Inter_600SemiBold',
     color: 'white',
+    marginLeft: 12,
   },
   featuresGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 16,
   },
   featureCard: {
     width: (width - 64) / 2,
@@ -228,6 +239,8 @@ const styles = StyleSheet.create({
     padding: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginRight: 16,
+    marginBottom: 16,
   },
   featureIcon: {
     width: 48,

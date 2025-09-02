@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Clipboard, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams, useFocusEffect } from 'expo-router';
 import { ArrowLeft, Copy, Send, TrendingUp, TrendingDown, Calculator, Edit3, Save } from 'lucide-react-native';
-import { signalService, SignalInsert, SignalUpdate } from '../services/signalService';
+import { signalService, SignalInsert, SignalUpdate } from '../../services/signalService';
+import * as Clipboard from 'expo-clipboard';
 
 type SignalFormData = {
   id?: string;
@@ -101,11 +102,25 @@ export default function CreateSignalScreen() {
   const handleSingleEntryAutoFill = (field: 'entryFrom' | 'entryTo', value: string) => {
     const formattedValue = formatPrice(value);
     setSignalData(prev => ({ ...prev, [field]: formattedValue }));
+    
     if (formattedValue && parseFloat(formattedValue) > 0) {
-      const otherField = field === 'entryFrom' ? 'entryTo' : 'from';
-      if (!signalData[otherField]) {
-        setTimeout(() => setSignalData(prev => ({ ...prev, [otherField]: formattedValue })), 500);
-      }
+      const otherField = field === 'entryFrom' ? 'entryTo' : 'entryFrom';
+      
+      // Use a function form of setSignalData to get the latest state
+      setSignalData(currentSignalData => {
+        if (!currentSignalData[otherField]) {
+          const timer = setTimeout(() => {
+            setSignalData(prev => {
+              if (!prev[otherField]) {
+                return { ...prev, [otherField]: formattedValue };
+              }
+              return prev;
+            });
+          }, 800);
+          // This cleanup is tricky in this context, but it's a short-lived component state change
+        }
+        return currentSignalData;
+      });
     }
   };
 
@@ -142,13 +157,13 @@ export default function CreateSignalScreen() {
     const emoji = action === 'BUY' ? '🟢' : '🔴';
     const trend = action === 'BUY' ? '📈' : '📉';
     const entryLabel = action === 'BUY' ? 'Buy Entry Zone' : 'Sell Entry Zone';
-    const entryDisplay = entryFrom === entryTo || !entryTo ? `$${entryFrom}` : `$${entryFrom} - $${entryTo}`;
+    const entryDisplay = entryFrom === entryTo || !entryTo || !entryFrom ? `$${entryFrom || entryTo}` : `$${entryFrom} - $${entryTo}`;
     
     return `${emoji} ${action} SIGNAL ${trend}\n\n📊 Pair: ${symbol}\n💰 ${entryLabel}: ${entryDisplay}\n🛑 Stop Loss: $${stopLoss}\n\n🎯 Take Profit Targets:\nTP1: $${takeProfit1} ${isAutoMode ? `(${autoCalc.tp1Pips} pips)` : ''}\nTP2: $${takeProfit2} ${isAutoMode ? `(${autoCalc.tp2Pips} pips)` : ''}\nTP3: $${takeProfit3} ${isAutoMode ? `(${autoCalc.tp3Pips} pips)` : ''}\n\n${isAutoMode ? `📐 SL: ${autoCalc.slPercentage}% | Risk Management\n` : ''}${notes ? `📝 Notes: ${notes}\n` : ''}\n⚠️ Always use proper risk management\n💡 Trade at your own risk\n\n#XAUUSD #Gold #Trading #Signals`;
   };
 
-  const handleCopyToClipboard = () => {
-    Clipboard.setString(generateTelegramFormat());
+  const handleCopyToClipboard = async () => {
+    await Clipboard.setStringAsync(generateTelegramFormat());
     Alert.alert('Success', 'Signal copied to clipboard!');
   };
 
@@ -175,7 +190,7 @@ export default function CreateSignalScreen() {
       } else {
         await signalService.createSignal({ ...payload, is_draft: true, status: 'draft' });
       }
-      Alert.alert('Draft Saved!', 'Your signal draft has been saved successfully.', [{ text: 'OK', onPress: () => router.push('/signal-history') }]);
+      Alert.alert('Draft Saved!', 'Your signal draft has been saved successfully.', [{ text: 'OK', onPress: () => router.push('/(app)/signal-history') }]);
     } catch (error) {
       Alert.alert('Error', 'Failed to save draft. Please try again.');
     } finally {
@@ -192,7 +207,7 @@ export default function CreateSignalScreen() {
       } else {
         await signalService.createSignal({ ...payload, is_draft: false, status: 'active' });
       }
-      Alert.alert('Signal Published!', 'Your signal is now active and being tracked.', [{ text: 'View History', onPress: () => router.push('/signal-history') }]);
+      Alert.alert('Signal Published!', 'Your signal is now active and being tracked.', [{ text: 'View History', onPress: () => router.push('/(app)/signal-history') }]);
     } catch (error) {
       Alert.alert('Error', 'Failed to publish signal. Please try again.');
     } finally {
@@ -229,7 +244,7 @@ export default function CreateSignalScreen() {
           <View style={styles.placeholder} />
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.content}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           <View style={styles.section}>
             <Text style={styles.label}>Signal Type</Text>
             <View style={styles.actionToggle}>
@@ -383,7 +398,7 @@ const styles = StyleSheet.create({
   backButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)', alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 20, fontFamily: 'Inter_600SemiBold', color: 'white' },
   placeholder: { width: 40 },
-  content: { flex: 1, paddingHorizontal: 24 },
+  content: { paddingHorizontal: 24 },
   section: { marginBottom: 24 },
   label: { fontSize: 16, fontFamily: 'Inter_500Medium', color: 'white', marginBottom: 8 },
   input: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 12, padding: 16, fontSize: 16, fontFamily: 'Inter_400Regular', color: 'white', borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' },

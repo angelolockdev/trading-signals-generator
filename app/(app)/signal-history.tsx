@@ -1,60 +1,15 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, FlatList, RefreshControl, Alert, ActivityIndicator } from 'react-native';
+import React, { useState, useMemo } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { router, useFocusEffect } from 'expo-router';
-import { ArrowLeft, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, DollarSign, RefreshCw, Trash2, Edit } from 'lucide-react-native';
-import { signalService, Signal } from '../services/signalService';
-import { GoldPriceService, SignalStatus } from '../utils/goldAPI';
+import { router } from 'expo-router';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, DollarSign, Trash2, Edit } from 'lucide-react-native';
+import { signalService, Signal } from '../../services/signalService';
+import { useSignals } from '../../context/SignalContext';
 
 export default function SignalHistoryScreen() {
   const [filter, setFilter] = useState<'all' | 'active' | 'closed' | 'drafts'>('all');
-  const [signals, setSignals] = useState<Signal[]>([]);
-  const [refreshing, setRefreshing] = useState(false);
-  const [currentGoldPrice, setCurrentGoldPrice] = useState<number>(0);
-
-  const goldService = GoldPriceService.getInstance();
-
-  const updateSignalStatuses = async () => {
-    try {
-      const goldPrice = await goldService.getCurrentGoldPrice();
-      setCurrentGoldPrice(goldPrice.price);
-
-      const storedSignals = await signalService.getAllSignals();
-      const updatedSignals: Signal[] = [];
-
-      for (const signal of storedSignals) {
-        let updatedSignal = { ...signal };
-        if (signal.status === 'active') {
-          const signalStatus: SignalStatus = await goldService.checkSignalStatus(signal);
-          await signalService.updateSignal(signal.id, {
-            status: signalStatus.status,
-            current_price: signalStatus.currentPrice,
-            pnl: signalStatus.pnl,
-            pnl_percentage: signalStatus.pnlPercentage
-          });
-          updatedSignal = { ...updatedSignal, ...signalStatus };
-        }
-        updatedSignals.push(updatedSignal);
-      }
-      setSignals(updatedSignals.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
-    } catch (error) {
-      console.error('Error updating signal statuses:', error);
-    }
-  };
-
-  useFocusEffect(
-    useCallback(() => {
-      setRefreshing(true);
-      updateSignalStatuses().finally(() => setRefreshing(false));
-    }, [])
-  );
-
-  const onRefresh = async () => {
-    setRefreshing(true);
-    await updateSignalStatuses();
-    setRefreshing(false);
-  };
+  const { signals, stats, loading, currentGoldPrice } = useSignals();
 
   const handleDeleteSignal = (signalId: string) => {
     Alert.alert('Delete Signal', 'Are you sure you want to delete this signal?', [
@@ -65,7 +20,7 @@ export default function SignalHistoryScreen() {
         onPress: async () => {
           try {
             await signalService.deleteSignal(signalId);
-            setSignals(prev => prev.filter(s => s.id !== signalId));
+            // UI will update automatically via Supabase subscription
           } catch (error) {
             Alert.alert('Error', 'Failed to delete signal');
           }
@@ -74,13 +29,15 @@ export default function SignalHistoryScreen() {
     ]);
   };
 
-  const filteredSignals = signals.filter(signal => {
-    if (filter === 'all') return !signal.is_draft;
-    if (filter === 'active') return signal.status === 'active' && !signal.is_draft;
-    if (filter === 'closed') return signal.status !== 'active' && !signal.is_draft;
-    if (filter === 'drafts') return signal.is_draft;
-    return true;
-  });
+  const filteredSignals = useMemo(() => {
+    return signals.filter(signal => {
+      if (filter === 'all') return !signal.is_draft;
+      if (filter === 'active') return signal.status === 'active' && !signal.is_draft;
+      if (filter === 'closed') return signal.status !== 'active' && signal.status !== 'draft';
+      if (filter === 'drafts') return signal.is_draft;
+      return true;
+    });
+  }, [signals, filter]);
 
   const getStatusColor = (status: string) => {
     if (status === 'draft') return '#64748b';
@@ -104,7 +61,7 @@ export default function SignalHistoryScreen() {
 
   const getStatusText = (status: string) => {
     if (status === 'draft') return 'DRAFT';
-    return status.replace('_', ' ').toUpperCase();
+    return status.replace(/_/g, ' ').toUpperCase();
   };
 
   const formatTimeAgo = (timestamp: string) => {
@@ -172,7 +129,7 @@ export default function SignalHistoryScreen() {
         ) : (
           <View style={styles.draftActionsContainer}>
             <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteSignal(item.id)}><Trash2 size={16} color="#ef4444" /></TouchableOpacity>
-            <TouchableOpacity style={styles.editButton} onPress={() => router.push({ pathname: '/create-signal', params: { draftId: item.id } })}>
+            <TouchableOpacity style={styles.editButton} onPress={() => router.push({ pathname: '/(app)/create-signal', params: { draftId: item.id } })}>
               <Edit size={16} color="white" />
               <Text style={styles.editButtonText}>Edit Draft</Text>
             </TouchableOpacity>
@@ -182,21 +139,13 @@ export default function SignalHistoryScreen() {
     );
   };
 
-  const publishedSignals = signals.filter(s => !s.is_draft);
-  const stats = {
-    total: publishedSignals.length,
-    active: publishedSignals.filter(s => s.status === 'active').length,
-    winRate: publishedSignals.length > 0 ? ((publishedSignals.filter(s => (s.pnl || 0) > 0).length / publishedSignals.length) * 100).toFixed(1) : '0',
-    totalPnl: publishedSignals.reduce((sum, s) => sum + (s.pnl || 0), 0)
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={styles.gradient}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => router.back()} style={styles.backButton}><ArrowLeft size={24} color="white" /></TouchableOpacity>
           <Text style={styles.title}>Signal History</Text>
-          <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}><RefreshCw size={20} color="white" /></TouchableOpacity>
+          <View style={{ width: 40 }} />
         </View>
 
         {currentGoldPrice > 0 && (
@@ -221,7 +170,7 @@ export default function SignalHistoryScreen() {
           ))}
         </View>
 
-        {refreshing && !signals.length ? (
+        {loading ? (
           <ActivityIndicator color="#FFD700" style={{ flex: 1 }} />
         ) : filteredSignals.length > 0 ? (
           <FlatList
@@ -230,13 +179,12 @@ export default function SignalHistoryScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.listContainer}
             showsVerticalScrollIndicator={false}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#22c55e" colors={['#22c55e']} />}
           />
         ) : (
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No signals found</Text>
             <Text style={styles.emptySubtext}>{filter === 'all' ? 'Create your first signal to start tracking' : `No ${filter} signals available`}</Text>
-            <TouchableOpacity style={styles.createButton} onPress={() => router.push('/create-signal')}><Text style={styles.createButtonText}>Create Signal</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.createButton} onPress={() => router.push('/(app)/create-signal')}><Text style={styles.createButtonText}>Create Signal</Text></TouchableOpacity>
           </View>
         )}
       </LinearGradient>
@@ -249,7 +197,6 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 16, paddingBottom: 16 },
   backButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)', alignItems: 'center', justifyContent: 'center' },
-  refreshButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)', alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 20, fontFamily: 'Inter_600SemiBold', color: 'white' },
   priceHeader: { alignItems: 'center', paddingHorizontal: 24, paddingBottom: 16 },
   currentPriceLabel: { fontSize: 12, fontFamily: 'Inter_400Regular', color: '#94a3b8', marginBottom: 4 },

@@ -1,16 +1,19 @@
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Slot } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
-import { useFrameworkReady } from '../hooks/useFrameworkReady';
+import { AuthProvider, useAuth } from '../context/AuthContext';
+import { ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SignalProvider } from '../context/SignalContext';
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
-  useFrameworkReady();
+const InitialLayout = () => {
+  const { loading: authLoading } = useAuth();
 
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
@@ -18,24 +21,31 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) {
+    if ((fontsLoaded || fontError) && !authLoading) {
       SplashScreen.hideAsync();
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError, authLoading]);
 
-  if (!fontsLoaded) {
-    return null;
+  if (authLoading || !fontsLoaded) {
+    return (
+      <LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#FFD700" />
+      </LinearGradient>
+    );
   }
 
   return (
-    <>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="index" />
-        <Stack.Screen name="create-signal" />
-        <Stack.Screen name="signal-history" />
-        <Stack.Screen name="+not-found" />
-      </Stack>
+    <SignalProvider>
+      <Slot />
+    </SignalProvider>
+  );
+};
+
+export default function RootLayout() {
+  return (
+    <AuthProvider>
+      <InitialLayout />
       <StatusBar style="light" />
-    </>
+    </AuthProvider>
   );
 }

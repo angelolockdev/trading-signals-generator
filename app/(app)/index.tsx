@@ -312,6 +312,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'Inter_600SemiBold',
     color: 'white',
+    marginBottom: 8,
   },
   viewAllText: {
     fontSize: 14,

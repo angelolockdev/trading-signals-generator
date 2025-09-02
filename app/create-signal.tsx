@@ -46,10 +46,10 @@ export default function CreateSignalScreen() {
 
   const [isAutoMode, setIsAutoMode] = useState(false);
   const [autoCalc, setAutoCalc] = useState<AutoCalculation>({
-    slPercentage: '2',
-    tp1Pips: '50',
-    tp2Pips: '100',
-    tp3Pips: '200'
+    slPercentage: '1',
+    tp1Pips: '500',
+    tp2Pips: '1000',
+    tp3Pips: '2000'
   });
 
   useFocusEffect(
@@ -144,7 +144,7 @@ export default function CreateSignalScreen() {
     const entryLabel = action === 'BUY' ? 'Buy Entry Zone' : 'Sell Entry Zone';
     const entryDisplay = entryFrom === entryTo || !entryTo ? `$${entryFrom}` : `$${entryFrom} - $${entryTo}`;
     
-    return `${emoji} ${action} SIGNAL ${trend}\n\n📊 Pair: ${symbol}\n💰 ${entryLabel}: ${entryDisplay}\n🛑 Stop Loss: $${stopLoss}\n\n🎯 Take Profit Targets:\nTP1: $${takeProfit1} ${isAutoMode ? `(${autoCalc.tp1Pips} pips)` : ''}\nTP2: $${takeProfit2} ${isAutoMode ? `(${autoCalc.tp2Pips} pips)` : ''}\nTP3: $${takeProfit3} ${isAutoMode ? `(${autoCalc.tp3Pips} pips)` : ''}\n\n${isAutoMode ? `📐 SL: ${autoCalc.slPercentage}% | Risk Management\n` : ''}${notes ? `📝 Notes: ${notes}\n` : ''}\n⚠️ Always use proper risk management\n💡 Trade at your own risk\n\n#XAUUSD #Gold #Trading #Signals`;
+    return `${emoji} ${action} SIGNAL ${trend}\n\n📊 Pair: ${symbol}\n💰 ${entryLabel}: ${entryDisplay}\n🛑 Stop Loss: $${stopLoss}\n\n🎯 Take Profit Targets:\nTP1: $${takeProfit1} ${isAutoMode ? `(${(parseFloat(autoCalc.tp1Pips)/10).toFixed(0)} pips)` : ''}\nTP2: $${takeProfit2} ${isAutoMode ? `(${(parseFloat(autoCalc.tp2Pips)/10).toFixed(0)} pips)` : ''}\nTP3: $${takeProfit3} ${isAutoMode ? `(${(parseFloat(autoCalc.tp3Pips)/10).toFixed(0)} pips)` : ''}\n\n${isAutoMode ? `📐 SL: ${autoCalc.slPercentage}% | Risk Management\n` : ''}${notes ? `📝 Notes: ${notes}\n` : ''}\n⚠️ Always use proper risk management\n💡 Trade at your own risk\n📣 Telegram: @mastergoldfx\n\n#XAUUSD #Gold #Trading #Signals`;
   };
 
   const handleCopyToClipboard = () => {
@@ -303,9 +303,9 @@ export default function CreateSignalScreen() {
               <View style={styles.section}>
                 <Text style={styles.label}>Take Profit (Pips)</Text>
                 <View style={styles.pipsContainer}>
-                  <View style={styles.pipInput}><Text style={styles.pipLabel}>TP1</Text><TextInput style={styles.pipInputField} placeholder="50" placeholderTextColor="#64748b" value={autoCalc.tp1Pips} onChangeText={(text) => setAutoCalc({ ...autoCalc, tp1Pips: text })} keyboardType="number-pad" /></View>
-                  <View style={styles.pipInput}><Text style={styles.pipLabel}>TP2</Text><TextInput style={styles.pipInputField} placeholder="100" placeholderTextColor="#64748b" value={autoCalc.tp2Pips} onChangeText={(text) => setAutoCalc({ ...autoCalc, tp2Pips: text })} keyboardType="number-pad" /></View>
-                  <View style={styles.pipInput}><Text style={styles.pipLabel}>TP3</Text><TextInput style={styles.pipInputField} placeholder="200" placeholderTextColor="#64748b" value={autoCalc.tp3Pips} onChangeText={(text) => setAutoCalc({ ...autoCalc, tp3Pips: text })} keyboardType="number-pad" /></View>
+                  <View style={styles.pipInput}><Text style={styles.pipLabel}>TP1</Text><TextInput style={styles.pipInputField} placeholder="500" placeholderTextColor="#64748b" value={autoCalc.tp1Pips} onChangeText={(text) => setAutoCalc({ ...autoCalc, tp1Pips: text })} keyboardType="number-pad" /></View>
+                  <View style={styles.pipInput}><Text style={styles.pipLabel}>TP2</Text><TextInput style={styles.pipInputField} placeholder="1000" placeholderTextColor="#64748b" value={autoCalc.tp2Pips} onChangeText={(text) => setAutoCalc({ ...autoCalc, tp2Pips: text })} keyboardType="number-pad" /></View>
+                  <View style={styles.pipInput}><Text style={styles.pipLabel}>TP3</Text><TextInput style={styles.pipInputField} placeholder="2000" placeholderTextColor="#64748b" value={autoCalc.tp3Pips} onChangeText={(text) => setAutoCalc({ ...autoCalc, tp3Pips: text })} keyboardType="number-pad" /></View>
                 </View>
                 <Text style={styles.helperText}>Pip value: $0.01 | Calculated from entry price</Text>
               </View>

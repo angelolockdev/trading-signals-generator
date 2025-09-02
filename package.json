@@ -1,10 +1,10 @@
 {
-  "name": "react-native-starter",
+  "name": "trading-signals-app",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "EXPO_NO_TELEMETRY=1 expo start",
+    "dev": "expo start",
     "build:web": "expo export --platform web",
     "lint": "expo lint"
   },
@@ -52,6 +52,7 @@
   "devDependencies": {
     "@babel/core": "^7.27.1",
     "@types/react": "~19.1.5",
+    "eas-cli": "^16.18.0",
     "typescript": "^5.8.3"
   }
 }

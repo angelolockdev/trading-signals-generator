@@ -218,11 +218,21 @@ export default function CreateSignalScreen() {
     );
   }
 
+  console.log('can back:', router.canGoBack());
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={styles.gradient}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <TouchableOpacity
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.push('/');
+              }
+            }}
+            style={styles.backButton}
+          >
             <ArrowLeft size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.title}>{isEditing ? 'Edit Signal' : 'Create Signal'}</Text>
@@ -396,7 +406,7 @@ const styles = StyleSheet.create({
   zoneLabel: { fontSize: 14, fontFamily: 'Inter_500Medium', color: '#94a3b8', marginBottom: 8 },
   priceInputContainer: { backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)', flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16 },
   currencySymbol: { fontSize: 16, fontFamily: 'Inter_500Medium', color: '#22c55e', marginRight: 8 },
-  priceInput: { flex: 1, paddingVertical: 16, fontSize: 16, fontFamily: 'Inter_400Regular', color: 'white' },
+  priceInput: { flex: 1, paddingVertical: 16, fontSize: 16, fontFamily: 'Inter_400Regular', color: 'white', width: '100%' },
   notesInput: { height: 80, textAlignVertical: 'top' },
   actionToggle: { flexDirection: 'row', backgroundColor: 'rgba(255, 255, 255, 0.05)', borderRadius: 12, padding: 4, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.1)' },
   actionButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12, borderRadius: 8, gap: 8 },

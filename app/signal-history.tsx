@@ -194,7 +194,18 @@ export default function SignalHistoryScreen() {
     <SafeAreaView style={styles.container}>
       <LinearGradient colors={['#1a1a2e', '#16213e', '#0f3460']} style={styles.gradient}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}><ArrowLeft size={24} color="white" /></TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.push('/');
+              }
+            }}
+            style={styles.backButton}
+          >
+            <ArrowLeft size={24} color="white" />
+          </TouchableOpacity>
           <Text style={styles.title}>Signal History</Text>
           <TouchableOpacity onPress={onRefresh} style={styles.refreshButton}><RefreshCw size={20} color="white" /></TouchableOpacity>
         </View>

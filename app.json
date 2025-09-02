@@ -1,0 +1,22 @@
+{
+    "expo": {
+      "name": "react-native-expo-starter",
+      "slug": "react-native-expo-starter",
+      "version": "1.0.0",
+      "orientation": "portrait",
+      "scheme": "myapp",
+      "userInterfaceStyle": "automatic",
+      "newArchEnabled": true,
+      "ios": {
+        "supportsTablet": true
+      },
+      "web": {
+        "bundler": "metro",
+        "output": "single",
+      },
+      "plugins": ["expo-router"],
+      "experiments": {
+        "typedRoutes": true
+      }
+    }
+  }

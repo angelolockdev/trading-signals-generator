@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { TrendingUp, MessageCircle, BarChart3, Plus, Clock, Star } from 'lucide-react-native';
+import { TrendingUp, MessageCircle, ChartBar as BarChart3, Plus, Clock, Star } from 'lucide-react-native';
 
 const { width } = Dimensions.get('window');
 
@@ -61,7 +61,7 @@ export default function HomeScreen() {
           {/* Stats Cards */}
           <View style={styles.statsContainer}>
             {stats.map((stat, index) => (
-              <View key={index} style={index === stats.length - 1 ? styles.statCardLast : styles.statCard}>
+              <View key={index} style={styles.statCard}>
                 <stat.icon size={20} color="#22c55e" />
                 <Text style={styles.statValue}>{stat.value}</Text>
                 <Text style={styles.statLabel}>{stat.label}</Text>
@@ -93,10 +93,7 @@ export default function HomeScreen() {
               {features.map((feature, index) => (
                 <TouchableOpacity
                   key={index}
-                  style={[
-                    styles.featureCard,
-                    index % 2 === 1 && { marginRight: 0 }
-                  ]}
+                  style={styles.featureCard}
                   onPress={() => router.push(feature.route)}
                 >
                   <View style={[styles.featureIcon, { backgroundColor: `${feature.color}20` }]}>

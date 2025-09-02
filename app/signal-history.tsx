@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, FlatList } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { ArrowLeft, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, DollarSign } from 'lucide-react-native';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, CircleCheck as CheckCircle, Circle as XCircle, DollarSign } from 'lucide-react-native';
 
 interface Signal {
   id: string;
@@ -202,7 +202,7 @@ export default function SignalHistoryScreen() {
             <Text style={[styles.statValue, { color: '#22c55e' }]}>{stats.winRate}%</Text>
             <Text style={styles.statLabel}>Win Rate</Text>
           </View>
-          <View style={styles.statCardLast}>
+          <View style={styles.statCard}>
             <Text style={[styles.statValue, { color: stats.totalPnl > 0 ? '#22c55e' : '#ef4444' }]}>
               ${stats.totalPnl.toFixed(0)}
             </Text>
@@ -215,11 +215,7 @@ export default function SignalHistoryScreen() {
           {['all', 'active', 'closed'].map((filterType) => (
             <TouchableOpacity
               key={filterType}
-              style={[
-                styles.filterButton, 
-                filter === filterType && styles.filterButtonActive,
-                filterType === 'closed' && { marginRight: 0 }
-              ]}
+              style={[styles.filterButton, filter === filterType && styles.filterButtonActive]}
               onPress={() => setFilter(filterType as any)}
             >
               <Text style={[styles.filterText, filter === filterType && styles.filterTextActive]}>

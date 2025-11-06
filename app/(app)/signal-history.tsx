@@ -3,9 +3,11 @@ import { View, Text, TouchableOpacity, StyleSheet, FlatList, Alert, ActivityIndi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { ArrowLeft, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, DollarSign, Trash2, Edit } from 'lucide-react-native';
+import { ArrowLeft, TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, DollarSign, Trash2, Edit, Download } from 'lucide-react-native';
 import { signalService, Signal } from '../../services/signalService';
 import { useSignals } from '../../context/SignalContext';
+import { AnalyticsService } from '../../utils/analytics';
+import * as Clipboard from 'expo-clipboard';
 
 export default function SignalHistoryScreen() {
   const [filter, setFilter] = useState<'all' | 'active' | 'closed' | 'drafts'>('all');
@@ -20,13 +22,22 @@ export default function SignalHistoryScreen() {
         onPress: async () => {
           try {
             await signalService.deleteSignal(signalId);
-            // UI will update automatically via Supabase subscription
           } catch (error) {
             Alert.alert('Error', 'Failed to delete signal');
           }
         }
       }
     ]);
+  };
+
+  const handleExportCSV = async () => {
+    try {
+      const csvData = AnalyticsService.exportToCSV(filteredSignals);
+      await Clipboard.setStringAsync(csvData);
+      Alert.alert('Export Successful', 'Signal data copied to clipboard as CSV format. You can paste it into Excel or any spreadsheet application.');
+    } catch (error) {
+      Alert.alert('Export Failed', 'Failed to export signals to CSV');
+    }
   };
 
   const filteredSignals = useMemo(() => {
@@ -156,7 +167,9 @@ export default function SignalHistoryScreen() {
             <ArrowLeft size={24} color="white" />
           </TouchableOpacity>
           <Text style={styles.title}>Signal History</Text>
-          <View style={{ width: 40 }} />
+          <TouchableOpacity onPress={handleExportCSV} style={styles.exportButton}>
+            <Download size={20} color="white" />
+          </TouchableOpacity>
         </View>
 
         {currentGoldPrice > 0 && (
@@ -208,6 +221,7 @@ const styles = StyleSheet.create({
   gradient: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 24, paddingTop: 16, paddingBottom: 16 },
   backButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.1)', alignItems: 'center', justifyContent: 'center' },
+  exportButton: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(34, 197, 94, 0.2)', alignItems: 'center', justifyContent: 'center' },
   title: { fontSize: 20, fontFamily: 'Inter_600SemiBold', color: 'white' },
   priceHeader: { alignItems: 'center', paddingHorizontal: 24, paddingBottom: 16 },
   currentPriceLabel: { fontSize: 12, fontFamily: 'Inter_400Regular', color: '#94a3b8', marginBottom: 4 },

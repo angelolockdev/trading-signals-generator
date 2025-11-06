@@ -1,7 +1,7 @@
 import React from 'react';
 import { Redirect, Tabs } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
-import { Home, PlusCircle, History, User } from 'lucide-react-native';
+import { Home, PlusCircle, History, User, BarChart3 } from 'lucide-react-native';
 import { ActivityIndicator } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -60,6 +60,13 @@ export default function AppLayout() {
         options={{
           title: 'History',
           tabBarIcon: ({ color, size }) => <History color={color} size={size} />,
+        }}
+      />
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          title: 'Analytics',
+          tabBarIcon: ({ color, size }) => <BarChart3 color={color} size={size} />,
         }}
       />
       <Tabs.Screen

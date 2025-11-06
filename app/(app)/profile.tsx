@@ -3,8 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../context/AuthContext';
-import { User, LogOut } from 'lucide-react-native';
+import { User, LogOut, BarChart3, Bell } from 'lucide-react-native';
 import { supabase } from '../../utils/supabase';
+import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const { user, loading } = useAuth();
@@ -38,6 +39,23 @@ export default function ProfileScreen() {
             <Text style={styles.cardDescription}>
               Your signals are being saved securely to your account.
             </Text>
+
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() => router.push('/(app)/analytics')}
+            >
+              <BarChart3 size={20} color="#3b82f6" />
+              <Text style={styles.menuButtonText}>View Analytics</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() => router.push('/(app)/alerts')}
+            >
+              <Bell size={20} color="#8b5cf6" />
+              <Text style={styles.menuButtonText}>Price Alerts</Text>
+            </TouchableOpacity>
+
             <TouchableOpacity style={styles.secondaryButton} onPress={handleSignOut}>
               <LogOut size={20} color="white" />
               <Text style={styles.buttonText}>Sign Out</Text>
@@ -127,6 +145,25 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontFamily: 'Inter_600SemiBold',
+    color: 'white',
+  },
+  menuButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    width: '100%',
+    gap: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  menuButtonText: {
+    fontSize: 16,
+    fontFamily: 'Inter_500Medium',
     color: 'white',
   },
 });

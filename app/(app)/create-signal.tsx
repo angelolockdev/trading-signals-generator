@@ -102,25 +102,20 @@ export default function CreateSignalScreen() {
   const handleSingleEntryAutoFill = (field: 'entryFrom' | 'entryTo', value: string) => {
     const formattedValue = formatPrice(value);
     setSignalData(prev => ({ ...prev, [field]: formattedValue }));
-    
+
     if (formattedValue && parseFloat(formattedValue) > 0) {
       const otherField = field === 'entryFrom' ? 'entryTo' : 'entryFrom';
-      
-      // Use a function form of setSignalData to get the latest state
-      setSignalData(currentSignalData => {
-        if (!currentSignalData[otherField]) {
-          const timer = setTimeout(() => {
-            setSignalData(prev => {
-              if (!prev[otherField]) {
-                return { ...prev, [otherField]: formattedValue };
-              }
-              return prev;
-            });
-          }, 800);
-          // This cleanup is tricky in this context, but it's a short-lived component state change
-        }
-        return currentSignalData;
-      });
+
+      const timer = setTimeout(() => {
+        setSignalData(prev => {
+          if (!prev[otherField]) {
+            return { ...prev, [otherField]: formattedValue };
+          }
+          return prev;
+        });
+      }, 800);
+
+      return () => clearTimeout(timer);
     }
   };
 

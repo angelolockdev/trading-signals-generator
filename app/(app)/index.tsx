@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Dimensions, Activ
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import { TrendingUp, MessageCircle, BarChart3, Plus, Clock, Star, DollarSign } from 'lucide-react-native';
+import { TrendingUp, MessageCircle, BarChart3, Plus, Clock, Star, DollarSign, Bell } from 'lucide-react-native';
 import { useSignals } from '../../context/SignalContext';
 import { Signal } from '../../services/signalService';
 
@@ -28,23 +28,23 @@ export default function HomeScreen() {
       color: '#22c55e'
     },
     {
-      icon: Clock,
-      title: 'Signal History',
-      description: 'View and track signal performance',
-      route: '/(app)/signal-history',
+      icon: BarChart3,
+      title: 'Analytics',
+      description: 'View detailed performance metrics',
+      route: '/(app)/analytics',
       color: '#3b82f6'
     },
     {
-      icon: MessageCircle,
-      title: 'Telegram Format',
-      description: 'Professional signal formatting',
-      route: '/(app)/create-signal',
+      icon: Bell,
+      title: 'Price Alerts',
+      description: 'Set custom price notifications',
+      route: '/(app)/alerts',
       color: '#8b5cf6'
     },
     {
-      icon: BarChart3,
-      title: 'Auto Tracking',
-      description: 'Real-time gold price monitoring',
+      icon: Clock,
+      title: 'History',
+      description: 'Track all your signals',
       route: '/(app)/signal-history',
       color: '#f59e0b'
     }
